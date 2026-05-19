@@ -17,19 +17,19 @@ These images contain ComfyUI workflow.
 
 ### Text to Image
 
-<img  alt="cat_sleeping_photo" src="images/cat_sleeping_photo.png">
+<img  width="400" height="400" alt="cat_sleeping_photo" src="images/cat_sleeping_photo.png">
 
 <img  alt="hidream-o1-t2i_workflow_20260519" src="images/uit-hidream-o1-t2i_20260519.png">
 
 ### Image to Image
 
-<img  alt="cat_sleeping_photo" src="images/cat_sleeping_anime.png">
+<img  width="400" height="400" alt="cat_sleeping_photo" src="images/cat_sleeping_anime.png">
 
 <img  alt="hidream-o1-i2i_workflow_20260519" src="images/uit-hidream-o1-i2i_20260519.png">
 
 ### Image Edit
 
-<img  alt="cat_sleeping_fireplace" src="images/cat_sleeping_fireplace.png">
+<img  width="400" height="400" alt="cat_sleeping_fireplace" src="images/cat_sleeping_fireplace.png">
 
 <img  alt="hidream-o1-edit_workflow_20260519" src="images/uit-hidream-o1-edit_20260519.png">
 
@@ -49,8 +49,6 @@ git clone https://github.com/easygoing0114/ComfyUI-uit-hidream-o1.git
 ```
 
 2. Restart ComfyUI. The **UIT Sampler** node should now appear in the node search under `sampling/uit`.
-
-## 📋 Node Reference
 
 ### UIT Sampler
 

@@ -6,7 +6,7 @@ An all-in-one sampling node (**UIT Sampler**) for [HiDream-O1-Image](https://git
 
 ### 🎛️ UIT Sampler
 
-- Single node covering the full generation pipeline for HiDream-O1-Image
+- Single node covering the full generation pipeline for UiT model.
 - img2img support — input images are automatically rescaled to 4 MP via Lanczos
 - Up to 2 reference images attachable to conditioning
 - Detects HiDreamO1 models at runtime and logs a notice about dummy CLIP/VAE

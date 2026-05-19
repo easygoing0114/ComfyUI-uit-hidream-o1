@@ -9,11 +9,37 @@ An all-in-one sampling node (**UIT Sampler**) for [HiDream-O1-Image](https://git
 - Single node covering the full generation pipeline for UiT model.
 - img2img support — input images are automatically rescaled to 4 MP via Lanczos
 - Up to 2 reference images attachable to conditioning
-- Detects HiDreamO1 models at runtime and logs a notice about dummy CLIP/VAE
-- `noise_scale` parameter with float precision (base: `8.0`, dev: `7.5`)
 - `step_images` output — all intermediate denoising steps in one batch tensor
 
+## 🔍 Workflows
+
+These images contain ComfyUI workflow.
+
+### Text to Image
+
+<img  alt="cat_sleeping_photo" src="images/cat_sleeping_photo.png">
+
+<img  alt="hidream-o1-t2i_workflow_20260519" src="images/uit-hidream-o1-t2i_20260519.png">
+
+### Image to Image
+
+<img  alt="cat_sleeping_photo" src="images/cat_sleeping_anime.png">
+
+<img  alt="hidream-o1-i2i_workflow_20260519" src="images/uit-hidream-o1-i2i_20260519.png">
+
+### Image Edit
+
+<img  alt="cat_sleeping_fireplace" src="images/cat_sleeping_fireplace.png">
+
+<img  alt="hidream-o1-edit_workflow_20260519" src="images/uit-hidream-o1-edit_20260519.png">
+
 ## 🔥 Installation
+
+### Install via Nodes Manager
+
+<img  alt="uit_sampler_hidream_o1_custom_node" src="images/uit-hidream-o1-search-node-manager.png">
+
+### Manual Install
 
 1. Clone this repository into your ComfyUI `custom_nodes` folder:
 
@@ -23,14 +49,6 @@ git clone https://github.com/easygoing0114/ComfyUI-uit-hidream-o1.git
 ```
 
 2. Restart ComfyUI. The **UIT Sampler** node should now appear in the node search under `sampling/uit`.
-
-## 🔍 Verification
-
-When a HiDream-O1 model is loaded, you should see this message in the console:
-
-```
-[UITSampler] UiT model detected (HiDreamO1). Loading dummy CLIP and VAE.
-```
 
 ## 📋 Node Reference
 

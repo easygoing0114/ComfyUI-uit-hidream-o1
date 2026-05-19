@@ -40,23 +40,6 @@ These images contain ComfyUI workflow.
 
 <img  alt="hidream-o1-edit_workflow_20260519" src="images/uit-hidream-o1-edit_20260519.png">
 
-## 🔥 Installation
-
-### Install via Nodes Manager
-
-<img  alt="uit_sampler_hidream_o1_custom_node" src="images/uit-hidream-o1-search-node-manager.png">
-
-### Manual Install
-
-1. Clone this repository into your ComfyUI `custom_nodes` folder:
-
-```bash
-cd ComfyUI/custom_nodes
-git clone https://github.com/easygoing0114/ComfyUI-uit-hidream-o1.git
-```
-
-2. Restart ComfyUI. The **UIT Sampler** node should now appear in the node search under `sampling/uit`.
-
 ### UIT Sampler
 
 **Category:** `sampling/uit`
@@ -100,6 +83,25 @@ git clone https://github.com/easygoing0114/ComfyUI-uit-hidream-o1.git
 **HiDream-O1 does not use an external VAE or CLIP**, but due to the specifications of ComfyUI, a dummy connection is required.
 
 **Default resolution** is 2048×2048 (4 MP), matching the HiDream-O1 training resolution. When `input_image` is connected, the resolution is derived from the rescaled image.
+
+---
+
+## 🔥 Installation
+
+### Install via Nodes Manager
+
+<img  alt="uit_sampler_hidream_o1_custom_node" src="images/uit-hidream-o1-search-node-manager.png">
+
+### Manual Install
+
+1. Clone this repository into your ComfyUI `custom_nodes` folder:
+
+```bash
+cd ComfyUI/custom_nodes
+git clone https://github.com/easygoing0114/ComfyUI-uit-hidream-o1.git
+```
+
+2. Restart ComfyUI. The **UIT Sampler** node should now appear in the node search under `sampling/uit`.
 
 ---
 

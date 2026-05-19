@@ -1,0 +1,13 @@
+[project]
+name = "comfyui-uit-hidream-o1"
+description = "ComfyUI custom node — UIT Sampler for HiDream-O1-Image"
+version = "1.0.0"
+license = { text = "MIT" }
+
+[project.urls]
+Repository = "https://github.com/easygoing0114/ComfyUI-uit-hidream-o1"
+
+[tool.comfy]
+PublisherId = "easygoing0114"
+DisplayName = "UIT Sampler HiDream-O1"
+Icon = "https://raw.githubusercontent.com/easygoing0114/ComfyUI-easygoing-nodes/main/Images/easygoing_nodes_icon_square_webp_400.webp"

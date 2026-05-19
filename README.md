@@ -97,7 +97,7 @@ git clone https://github.com/easygoing0114/ComfyUI-uit-hidream-o1.git
 
 ### Notes
 
-**HiDream-O1 does not use an external VAE or CLIP**, but due to the specifications of comfyui, a dummy connection is required.
+**HiDream-O1 does not use an external VAE or CLIP**, but due to the specifications of ComfyUI, a dummy connection is required.
 
 **Default resolution** is 2048×2048 (4 MP), matching the HiDream-O1 training resolution. When `input_image` is connected, the resolution is derived from the rescaled image.
 

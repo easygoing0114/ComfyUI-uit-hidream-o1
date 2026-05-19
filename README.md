@@ -11,6 +11,13 @@ An all-in-one sampling node (**UIT Sampler**) for [HiDream-O1-Image](https://git
 - Up to 2 reference images attachable to conditioning
 - `step_images` output — all intermediate denoising steps in one batch tensor
 
+## 👈 Models
+
+- [Comfy-Org (Recommended)](https://huggingface.co/Comfy-Org/HiDream-O1-Image/tree/main/checkpoints)
+- [HiDream-O1-Image (Official)](https://huggingface.co/HiDream-ai/HiDream-O1-Image)
+- [HiDream-O1-Image-Dev (Official)](https://huggingface.co/HiDream-ai/HiDream-O1-Image-Dev)
+- [HiDream-O1-Image-Dev-2604 (Official)](https://huggingface.co/HiDream-ai/HiDream-O1-Image-Dev-2604)
+
 ## 🔍 Workflows
 
 These images contain ComfyUI workflow.
@@ -90,7 +97,7 @@ git clone https://github.com/easygoing0114/ComfyUI-uit-hidream-o1.git
 
 ### Notes
 
-**HiDream-O1 does not use an external VAE or CLIP.** The node accepts these as optional stub inputs so it fits naturally into standard ComfyUI workflows.
+**HiDream-O1 does not use an external VAE or CLIP**, but due to the specifications of comfyui, a dummy connection is required.
 
 **Default resolution** is 2048×2048 (4 MP), matching the HiDream-O1 training resolution. When `input_image` is connected, the resolution is derived from the rescaled image.
 

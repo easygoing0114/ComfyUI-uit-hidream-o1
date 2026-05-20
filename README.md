@@ -14,6 +14,7 @@ An all-in-one sampling node (**UIT Sampler**) for [HiDream-O1-Image](https://git
 ## 👈 Models
 
 - [Comfy-Org (Recommended)](https://huggingface.co/Comfy-Org/HiDream-O1-Image/tree/main/checkpoints)
+- [HiDream-O1-Image_clear (Finetuned model for clear outputs)](https://huggingface.co/easygoing0114/HiDream-O1-Image_clear)
 - [HiDream-O1-Image (Official)](https://huggingface.co/HiDream-ai/HiDream-O1-Image)
 - [HiDream-O1-Image-Dev (Official)](https://huggingface.co/HiDream-ai/HiDream-O1-Image-Dev)
 - [HiDream-O1-Image-Dev-2604 (Official)](https://huggingface.co/HiDream-ai/HiDream-O1-Image-Dev-2604)

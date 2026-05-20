@@ -26,19 +26,19 @@ These images contain ComfyUI workflow.
 
 <img  width="400" height="400" alt="cat_sleeping_photo" src="images/cat_sleeping_photo.png">
 
-<img  alt="hidream-o1-t2i_workflow_20260519" src="images/uit-hidream-o1-t2i_20260519.png">
+<img  alt="hidream-o1-t2i_workflow_20260520" src="images/uit-hidream-o1-t2i_20260520.png">
 
 ### Image to Image
 
 <img  width="400" height="400" alt="cat_sleeping_photo" src="images/cat_sleeping_anime.png">
 
-<img  alt="hidream-o1-i2i_workflow_20260519" src="images/uit-hidream-o1-i2i_20260519.png">
+<img  alt="hidream-o1-i2i_workflow_20260520" src="images/uit-hidream-o1-i2i_20260520.png">
 
 ### Image Edit
 
 <img  width="400" height="400" alt="cat_sleeping_fireplace" src="images/cat_sleeping_fireplace.png">
 
-<img  alt="hidream-o1-edit_workflow_20260519" src="images/uit-hidream-o1-edit_20260519.png">
+<img  alt="hidream-o1-edit_workflow_20260520" src="images/uit-hidream-o1-edit_20260520.png">
 
 ### UIT Sampler
 

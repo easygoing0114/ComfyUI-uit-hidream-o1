@@ -2,13 +2,19 @@
 nodes_uit_hidream.py
 ────────────────────────────────────────────────────────────────────────────
 UIT Sampler — Sampling node for HiDream-O1-Image (noise_scale float support).
-
 Use the standard Load Checkpoint node to load the model.
 
 Installation
 ────────────
 Place this file in:
-    ComfyUI/custom_nodes/nodes_uit_hidream.py
+  ComfyUI/custom_nodes/nodes_uit_hidream.py
+
+Changes from original
+─────────────────────
+- reference_image は positive_cond にのみ渡すように変更。
+  negative_cond への conditioning_set_values を削除することで、
+  CFG の差分計算 (positive - negative) に reference_image の情報が
+  残り、cfg_scale が reference_image にも有効に機能するようになる。
 """
 
 from __future__ import annotations
@@ -31,11 +37,11 @@ import node_helpers
 # ─────────────────────────────────────────────────────────────────────────────
 # Constants
 # ─────────────────────────────────────────────────────────────────────────────
+
 TARGET_MEGAPIXELS = 4_000_000   # 4 MP training resolution
 PATCH_MULTIPLE    = 32          # resolution must be divisible by this
 DEFAULT_WIDTH     = 2048
 DEFAULT_HEIGHT    = 2048
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Helper utilities
@@ -92,6 +98,14 @@ class UITSampler:
     ──────────────────────────────────────────────────────────────────────────
     All-in-one sampling node for HiDream-O1-Image.
     Intermediate step images are available in bulk from 'step_images' output.
+
+    CFG と reference_image について
+    ────────────────────────────────
+    reference_latents は positive_cond にのみ付加する。
+    negative_cond には付加しないことで、CFG の差分
+      output = uncond + cfg_scale × (cond - uncond)
+    に reference_image の寄与が残り、cfg_scale が reference_image にも
+    有効に機能する。
     """
 
     CATEGORY     = "sampling/uit"
@@ -103,32 +117,32 @@ class UITSampler:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "model":    ("MODEL",),
+                "model": ("MODEL",),
                 # ── generation settings ───────────────────────────────────
-                "width":    ("INT",   {"default": DEFAULT_WIDTH,
-                                       "min": 64, "max": 4096, "step": 32,
-                                       "tooltip": "Ignored when input_image is connected."}),
-                "height":   ("INT",   {"default": DEFAULT_HEIGHT,
-                                       "min": 64, "max": 4096, "step": 32,
-                                       "tooltip": "Ignored when input_image is connected."}),
-                "seed":     ("INT",   {"default": 0,
-                                       "min": 0, "max": 0xFFFFFFFFFFFFFFFF}),
-                "cfg":      ("FLOAT", {"default": 3.0,
-                                       "min": 0.0, "max": 30.0, "step": 0.1}),
-                "sampler":  (_SAMPLER_NAMES,   {"default": "euler"}),
-                "scheduler":(_SCHEDULER_NAMES, {"default": "normal"}),
-                "steps":    ("INT",   {"default": 12, "min": 1, "max": 200}),
-                "denoise":  ("FLOAT", {"default": 1.0,
-                                       "min": 0.0, "max": 1.0, "step": 0.01}),
+                "width":  ("INT",  {"default": DEFAULT_WIDTH,
+                                    "min": 64, "max": 4096, "step": 32,
+                                    "tooltip": "Ignored when input_image is connected."}),
+                "height": ("INT",  {"default": DEFAULT_HEIGHT,
+                                    "min": 64, "max": 4096, "step": 32,
+                                    "tooltip": "Ignored when input_image is connected."}),
+                "seed":   ("INT",  {"default": 0,
+                                    "min": 0, "max": 0xFFFFFFFFFFFFFFFF}),
+                "cfg":    ("FLOAT",{"default": 3.0,
+                                    "min": 0.0, "max": 30.0, "step": 0.1}),
+                "sampler":   (_SAMPLER_NAMES,   {"default": "euler"}),
+                "scheduler": (_SCHEDULER_NAMES, {"default": "normal"}),
+                "steps":   ("INT",  {"default": 12, "min": 1, "max": 200}),
+                "denoise": ("FLOAT",{"default": 1.0,
+                                     "min": 0.0, "max": 1.0, "step": 0.01}),
                 "noise_scale": ("FLOAT", {"default": 8.0, "min": 1.0, "max": 12.0, "step": 0.1,
                                           "tooltip": "Equivalent to ModelNoiseScale. HiDream-O1 base: 8.0, dev: 7.5."}),
             },
             "optional": {
-                "clip":     ("CLIP",),
-                "vae":      ("VAE",),
-                "input_image":      ("IMAGE",  {"tooltip": "Source image for img2img. Rescaled to 4MP via Lanczos."}),
-                "reference_image1": ("IMAGE",  {"tooltip": "Reference image 1."}),
-                "reference_image2": ("IMAGE",  {"tooltip": "Reference image 2."}),
+                "clip":             ("CLIP",),
+                "vae":              ("VAE",),
+                "input_image":      ("IMAGE", {"tooltip": "Source image for img2img. Rescaled to 4MP via Lanczos."}),
+                "reference_image1": ("IMAGE", {"tooltip": "Reference image 1."}),
+                "reference_image2": ("IMAGE", {"tooltip": "Reference image 2."}),
                 "positive_prompt":  ("STRING", {"forceInput": True}),
                 "negative_prompt":  ("STRING", {"forceInput": True}),
             },
@@ -140,7 +154,7 @@ class UITSampler:
     def _encode_prompt(clip, text: str):
         tokens = clip.tokenize(text or "")
         result = clip.encode_from_tokens(tokens, return_pooled=True, return_dict=True)
-        cond = result.pop("cond")
+        cond   = result.pop("cond")
         return [[cond, result]]
 
     @staticmethod
@@ -150,7 +164,7 @@ class UITSampler:
 
     @staticmethod
     def _latent_from_size(width: int, height: int, batch: int = 1) -> dict:
-        dev = comfy.model_management.intermediate_device()
+        dev    = comfy.model_management.intermediate_device()
         latent = torch.zeros((batch, 3, height, width), device=dev)
         return {"samples": latent}
 
@@ -161,14 +175,14 @@ class UITSampler:
         model,
         clip,
         vae,
-        width: int,
-        height: int,
-        seed: int,
-        cfg: float,
-        sampler: str,
-        scheduler: str,
-        steps: int,
-        denoise: float,
+        width:       int,
+        height:      int,
+        seed:        int,
+        cfg:         float,
+        sampler:     str,
+        scheduler:   str,
+        steps:       int,
+        denoise:     float,
         noise_scale: float,
         input_image:      Optional[torch.Tensor] = None,
         reference_image1: Optional[torch.Tensor] = None,
@@ -191,7 +205,7 @@ class UITSampler:
         m = model.clone()
         if noise_scale != 1.0:
             original_ms = m.get_model_object("model_sampling")
-            new_ms = type(original_ms)(m.model.model_config)
+            new_ms      = type(original_ms)(m.model.model_config)
             new_ms.set_parameters(
                 shift=original_ms.shift,
                 multiplier=original_ms.multiplier,
@@ -204,22 +218,25 @@ class UITSampler:
         negative_cond = self._encode_prompt(clip, negative_prompt)
 
         # ── 3. Attach reference images to conditioning ────────────────────────
+        # reference_latents は positive_cond にのみ付加する。
+        # negative_cond には付加しないことで CFG の差分計算
+        #   output = uncond + cfg_scale × (cond - uncond)
+        # に reference_image の寄与が残り、cfg_scale が
+        # reference_image にも有効に機能する。
         refs = [r for r in (reference_image1, reference_image2) if r is not None]
         if refs:
             positive_cond = node_helpers.conditioning_set_values(
                 positive_cond, {"reference_latents": refs}, append=True
             )
-            negative_cond = node_helpers.conditioning_set_values(
-                negative_cond, {"reference_latents": refs}, append=True
-            )
+            # negative_cond には reference_latents を渡さない（修正点）
 
         # ── 4. Prepare latent ─────────────────────────────────────────────────
         if input_image is not None:
             rescaled    = _rescale_image_to_megapixels(input_image)
             latent_dict = self._image_to_latent(vae, rescaled)
         else:
-            gen_w = _round_to_multiple(width)
-            gen_h = _round_to_multiple(height)
+            gen_w       = _round_to_multiple(width)
+            gen_h       = _round_to_multiple(height)
             latent_dict = self._latent_from_size(gen_w, gen_h)
 
         # ── 5. Build sampler and sigmas ───────────────────────────────────────
@@ -236,9 +253,8 @@ class UITSampler:
             sigmas = sigmas[-(steps + 1):]
 
         # ── 6. Run sampling (with step image collection callback) ─────────────
-        noise = comfy.sample.prepare_noise(latent_dict["samples"], seed, None)
-
-        x0_output     = {}
+        noise       = comfy.sample.prepare_noise(latent_dict["samples"], seed, None)
+        x0_output   = {}
         preview_steps = max(len(sigmas) - 1, 1)
         base_callback = latent_preview.prepare_callback(m, preview_steps, x0_output)
 
@@ -247,7 +263,6 @@ class UITSampler:
         def uitsampler_callback(step, x0, x, total_steps):
             if base_callback is not None:
                 base_callback(step, x0, x, total_steps)
-
             if x0 is not None:
                 with torch.no_grad():
                     decoded = vae.decode(x0)

@@ -111,6 +111,10 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Update History
 
-### 2025.5.19
+## 2025.5.20 (v0.1.0)
+
+- Fixed an issue where `reference_image` was also applied to `negative_cond`.
+
+### 2025.5.19 (v0.0.3)
 
 - Initial release: UIT Sampler for HiDream-O1-Image

@@ -30,21 +30,33 @@ These images contain ComfyUI workflow.
 
 ### Text to Image
 
-<img  width="400" height="400" alt="cat_sleeping_photo" src="images/cat_sleeping_photo.png">
+<div align="center">
+<img width="400" height="400" alt="cat_sleeping_photo" src="images/cat_sleeping_photo.png">
+</div>
 
-<img  alt="hidream-o1-t2i_workflow_20260520" src="images/uit-hidream-o1-t2i_20260520.png">
+<div align="center">
+<img alt="hidream-o1-t2i_workflow_20260520" src="images/uit-hidream-o1-t2i_20260520.png" width="800">
+</div>
 
 ### Image to Image
 
-<img  width="400" height="400" alt="cat_sleeping_photo" src="images/cat_sleeping_anime.png">
+<div align="center">
+<img width="400" height="400" alt="cat_sleeping_photo" src="images/cat_sleeping_anime.png">
+</div>
 
-<img  alt="hidream-o1-i2i_workflow_20260520" src="images/uit-hidream-o1-i2i_20260520.png">
+<div align="center">
+<img alt="hidream-o1-i2i_workflow_20260520" src="images/uit-hidream-o1-i2i_20260520.png" width="800">
+</div>
 
 ### Image Edit
 
-<img  width="400" height="400" alt="cat_sleeping_fireplace" src="images/cat_sleeping_fireplace.png">
+<div align="center">
+<img width="400" height="400" alt="cat_sleeping_fireplace" src="images/cat_sleeping_fireplace.png" width="800">
+</div>
 
-<img  alt="hidream-o1-edit_workflow_20260520" src="images/uit-hidream-o1-edit_20260520.png">
+<div align="center">
+<img alt="hidream-o1-edit_workflow_20260520" src="images/uit-hidream-o1-edit_20260520.png" width="800">
+</div>
 
 ### UIT Sampler
 
@@ -94,7 +106,9 @@ These images contain ComfyUI workflow.
 
 ### Install via Nodes Manager
 
-<img  alt="uit_sampler_hidream_o1_custom_node" src="images/uit-hidream-o1-search-node-manager.png">
+<div align="center">
+<img alt="uit-hidream-o1-search-node-manager" src="images/uit-hidream-o1-search-node-manager_with_box.png" width="800" height="500">
+</div>
 
 ### Manual Install
 

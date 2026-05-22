@@ -5,7 +5,7 @@
 
 # ComfyUI-uit-hidream-o1
 
-An all-in-one sampling node (**UIT Sampler**) for [HiDream-O1-Image](https://github.com/HiDream-ai/HiDream-O1-Image) .
+Single sampling node (**UIT Sampler**) for [HiDream-O1-Image](https://github.com/HiDream-ai/HiDream-O1-Image) .
 
 ## ✨ Features
 

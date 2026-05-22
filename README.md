@@ -1,3 +1,8 @@
+
+<div align="center">
+<img width="705" height="500" alt="ComfyUI-uit-hidream-o1_banner_silver_ratio" src="images/ComfyUI-uit-hidream-o1_banner_silver_ratio.png">
+</div>
+
 # ComfyUI-uit-hidream-o1
 
 An all-in-one sampling node (**UIT Sampler**) for [HiDream-O1-Image](https://github.com/HiDream-ai/HiDream-O1-Image) .

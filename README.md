@@ -26,8 +26,6 @@ Single sampling node (**UIT Sampler**) for [HiDream-O1-Image](https://github.com
 
 ## 🔍 Workflows
 
-These images contain ComfyUI workflow.
-
 ### Text to Image
 
 <div align="center">
@@ -57,6 +55,8 @@ These images contain ComfyUI workflow.
 <div align="center">
 <img alt="hidream-o1-edit_workflow_20260520" src="images/uit-hidream-o1-edit_20260520.png" width="800">
 </div>
+
+These images contain ComfyUI workflow.
 
 ### UIT Sampler
 

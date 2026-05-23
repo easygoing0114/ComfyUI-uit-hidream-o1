@@ -131,6 +131,10 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Update History
 
+### 2025.5.23 (v0.2.0)
+
+- Fixed minor issues.
+
 ### 2025.5.20 (v0.1.1)
 
 - Fixed an issue where `reference_image` was also applied to `negative_cond`.

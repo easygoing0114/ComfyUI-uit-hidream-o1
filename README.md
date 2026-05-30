@@ -123,6 +123,13 @@ git clone https://github.com/easygoing0114/ComfyUI-uit-hidream-o1.git
 
 ---
 
+## 👀 Tips
+
+- HiDream-O1-Image and UiT architecture: [English](https://www.ai-image-journey.com/2026/05/hidream-o1-image.html) | [Japanese](https://note.com/ai_image_journey/n/nc088edc43d6d)
+- Image Generative AI model License: [English](https://www.ai-image-journey.com/2025/09/ai-model-license.html) | [Japanese](https://note.com/ai_image_journey/n/n1083339913df)
+
+---
+
 ## ⚖️ License
 
 This project is licensed under the [MIT License](LICENSE).

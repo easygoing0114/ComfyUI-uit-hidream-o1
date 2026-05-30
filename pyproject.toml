@@ -1,11 +1,12 @@
 [project]
 name = "comfyui-uit-hidream-o1"
 description = "ComfyUI custom node — UIT Sampler for HiDream-O1-Image"
-version = "0.2.0"
+version = "0.2.1"
 license = { text = "MIT" }
 
 [project.urls]
 Repository = "https://github.com/easygoing0114/ComfyUI-uit-hidream-o1"
+Documentation = "https://www.ai-image-journey.com/2026/05/hidream-o1-image-clear-v1.html"
 
 [tool.comfy]
 PublisherId = "easygoing0114"

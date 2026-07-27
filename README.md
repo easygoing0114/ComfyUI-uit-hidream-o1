@@ -138,6 +138,10 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Update History
 
+### 2025.7.28 (v0.3.0)
+
+- Migrated to the comfyui v3 schema.
+
 ### 2025.5.23 (v0.2.0)
 
 - Fixed minor issues.

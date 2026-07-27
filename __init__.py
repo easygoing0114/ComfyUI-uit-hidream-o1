@@ -1,3 +1,3 @@
-from .nodes_uit_hidream import NODE_CLASS_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS
+from .nodes_uit_hidream import comfy_entrypoint
 
-__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]
+__all__ = ["comfy_entrypoint"]

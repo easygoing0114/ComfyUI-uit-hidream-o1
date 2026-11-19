@@ -162,7 +162,7 @@ class UITSampler(io.ComfyNode):
                 ),
                 io.Float.Input(
                     "cfg",
-                    default=3.0,
+                    default=1.0,
                     min=0.0, max=30.0, step=0.1,
                 ),
                 io.Combo.Input(
@@ -187,7 +187,7 @@ class UITSampler(io.ComfyNode):
                 ),
                 io.Float.Input(
                     "noise_scale",
-                    default=8.0,
+                    default=7.6,
                     min=1.0, max=12.0, step=0.1,
                     tooltip="Equivalent to ModelNoiseScale. HiDream-O1 base: 8.0, dev: 7.5.",
                 ),

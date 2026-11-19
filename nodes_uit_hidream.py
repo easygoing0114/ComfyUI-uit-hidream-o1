@@ -1,25 +1,16 @@
 """
 nodes_uit_hidream.py
-────────────────────────────────────────────────────────────────────────────
-UIT Sampler — Sampling node for HiDream-O1-Image (noise_scale float support).
-Use the standard Load Checkpoint node to load the model.
 
-Migrated to ComfyUI V3 node schema (comfy_api.latest).
+UIT Sampler: sampling node for HiDream-O1-Image with a float noise_scale.
+Load the model with the standard Load Checkpoint node.
 
-Installation
-────────────
-Place this file in:
+Installation:
     ComfyUI/custom_nodes/nodes_uit_hidream.py
 
-Notes
-─────
-* HiDream-O1 runs in bf16 (or fp32). ComfyUI deliberately does not offer fp16
-  for this model (fp16 overflows in the LM MLP and produces NaNs), so an
-  FP16 checkpoint is always cast to bf16 on load. This is not a node setting.
-* The per-step image preview used to call `vae.decode()` from inside the
-  sampling callback. That makes ComfyUI (re)load the VAE patcher in the middle
-  of sampling, which fights with the diffusion model for VRAM / dynamic-VRAM
-  state. Step images are now collected on the CPU and decoded after sampling.
+Notes:
+* HiDream-O1 runs in bf16 or fp32 only. FP16 checkpoints are cast to bf16 on load.
+* Step images are kept on the CPU during sampling and decoded afterwards,
+  so the VAE is never loaded while the diffusion model is running.
 """
 
 from __future__ import annotations
@@ -46,18 +37,18 @@ log = logging.getLogger(__name__)
 # Constants
 # ─────────────────────────────────────────────────────────────────────────────
 
-TARGET_MEGAPIXELS = 4_000_000  # 4 MP training resolution
-PATCH_MULTIPLE = 32            # resolution must be divisible by this
+TARGET_MEGAPIXELS = 4_000_000  # training resolution (4 MP)
+PATCH_MULTIPLE = 32            # width/height must be divisible by this
 DEFAULT_WIDTH = 2048
 DEFAULT_HEIGHT = 2048
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Helper utilities
+# Helpers
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _round_to_multiple(value: int, multiple: int = PATCH_MULTIPLE) -> int:
-    """Round down to the nearest multiple of `multiple` (minimum = multiple)."""
+    """Round down to a multiple (minimum: one multiple)."""
     return max(multiple, (value // multiple) * multiple)
 
 
@@ -66,12 +57,7 @@ def _rescale_image_to_megapixels(
     target_mp: int = TARGET_MEGAPIXELS,
     multiple: int = PATCH_MULTIPLE,
 ) -> torch.Tensor:
-    """
-    Rescale a ComfyUI IMAGE tensor (B, H, W, C) to ~target_mp pixels while
-    preserving aspect ratio. Both sides are rounded down to `multiple`.
-    Uses ComfyUI's Lanczos resampling (float precision, no uint8 round trip,
-    no dependency on Pillow API details).
-    """
+    """Rescale an IMAGE tensor (B, H, W, C) to ~target_mp pixels, keeping aspect ratio."""
     _, H, W, _ = image_tensor.shape
     aspect = W / H
 
@@ -95,12 +81,10 @@ def _is_pixel_space_vae(vae) -> bool:
 
 def _decode_to_image(vae, samples: torch.Tensor) -> torch.Tensor:
     """
-    Latent/pixel samples (B, C, H, W) -> IMAGE tensor (B, H, W, C) in [0, 1].
+    Samples (B, C, H, W) -> IMAGE tensor (B, H, W, C) in [0, 1].
 
-    HiDream-O1 is a pixel-space model: its "VAE" is an identity mapping.
-    Going through `vae.decode()` would load the VAE patcher and cast the
-    result to the VAE dtype (bf16), which only costs VRAM and precision, so
-    the (x + 1) / 2 conversion is done directly in fp32 for that case.
+    HiDream-O1 is pixel-space, so the "VAE" is an identity mapping. The
+    (x + 1) / 2 conversion is done directly in fp32 to avoid loading the VAE.
     """
     if _is_pixel_space_vae(vae):
         if samples.is_nested:
@@ -119,17 +103,12 @@ _SCHEDULER_NAMES = comfy.samplers.KSampler.SCHEDULERS
 
 
 class UITSampler(io.ComfyNode):
-    """
-    UIT Sampler
-    ──────────────────────────────────────────────────────────────────────────
-    All-in-one sampling node for HiDream-O1-Image.
-    Intermediate step images are available in bulk from 'step_images' output.
-    """
+    """All-in-one sampling node for HiDream-O1-Image."""
 
     @classmethod
     def define_schema(cls) -> io.Schema:
-        # NOTE: the order of the widgets (width ... noise_scale) must not change,
-        # otherwise saved workflows would load their values into the wrong widgets.
+        # Keep the widget order (width ... noise_scale) unchanged,
+        # otherwise saved workflows load values into the wrong widgets.
         return io.Schema(
             node_id="UITSampler",
             display_name="UIT Sampler",
@@ -141,7 +120,6 @@ class UITSampler(io.ComfyNode):
             ),
             inputs=[
                 io.Model.Input("model"),
-                # ── generation settings ───────────────────────────────────
                 io.Int.Input(
                     "width",
                     default=DEFAULT_WIDTH,
@@ -191,7 +169,6 @@ class UITSampler(io.ComfyNode):
                     min=1.0, max=12.0, step=0.1,
                     tooltip="Equivalent to ModelNoiseScale. HiDream-O1 base: 8.0, dev: 7.5.",
                 ),
-                # ── optional inputs ────────────────────────────────────────
                 io.Clip.Input("clip", optional=True),
                 io.Vae.Input("vae", optional=True),
                 io.Image.Input(
@@ -227,6 +204,7 @@ class UITSampler(io.ComfyNode):
         )
 
     # ── Internal helpers ──────────────────────────────────────────────────────
+
     @staticmethod
     def _encode_prompt(clip, text: str):
         tokens = clip.tokenize(text or "")
@@ -246,6 +224,7 @@ class UITSampler(io.ComfyNode):
         return {"samples": latent}
 
     # ── Main execution ────────────────────────────────────────────────────────
+
     @classmethod
     def execute(
         cls,
@@ -272,23 +251,19 @@ class UITSampler(io.ComfyNode):
         if vae is None:
             raise ValueError("[UITSampler] 'vae' input is required (connect VAE from Load Checkpoint).")
 
-        # ── 0. Model info log ─────────────────────────────────────────────────
+        # Log model info
         try:
-            model_class_name = type(model.model).__name__
-            compute_dtype = model.model.get_dtype_inference()
             log.info(
-                "[UITSampler] model=%s compute dtype=%s "
-                "(HiDream-O1 supports bf16/fp32 only; fp16 checkpoints are cast to bf16)",
-                model_class_name, compute_dtype,
+                "[UITSampler] model=%s compute dtype=%s",
+                type(model.model).__name__, model.model.get_dtype_inference(),
             )
         except Exception:
             pass
 
-        # ── 1. Apply noise scale ──────────────────────────────────────────────
+        # 1. Apply noise scale
         m = model.clone()
         original_ms = m.get_model_object("model_sampling")
-        # Compare against the model's *current* noise scale (HiDream-O1 defaults
-        # to 8.0, not 1.0), so that choosing 1.0 really gives 1.0.
+        # Compare with the model's current value (HiDream-O1 defaults to 8.0, not 1.0).
         current_ns = float(getattr(original_ms, "noise_scale", 1.0))
         if abs(noise_scale - current_ns) > 1e-6:
             new_ms = type(original_ms)(m.model.model_config)
@@ -299,11 +274,11 @@ class UITSampler(io.ComfyNode):
             new_ms.set_noise_scale(noise_scale)
             m.add_object_patch("model_sampling", new_ms)
 
-        # ── 2. Encode prompts ─────────────────────────────────────────────────
+        # 2. Encode prompts
         positive_cond = cls._encode_prompt(clip, positive_prompt)
         negative_cond = cls._encode_prompt(clip, negative_prompt)
 
-        # ── 3. Attach reference images to conditioning ────────────────────────
+        # 3. Attach reference images to conditioning
         refs = [r for r in (reference_image1, reference_image2) if r is not None]
         if refs:
             positive_cond = node_helpers.conditioning_set_values(
@@ -316,7 +291,7 @@ class UITSampler(io.ComfyNode):
                 negative_cond, {"reference_latents": refs}, append=True
             )
 
-        # ── 4. Prepare latent ─────────────────────────────────────────────────
+        # 4. Prepare latent
         if input_image is not None:
             rescaled = _rescale_image_to_megapixels(input_image)
             latent_dict = cls._image_to_latent(vae, rescaled)
@@ -325,7 +300,7 @@ class UITSampler(io.ComfyNode):
             gen_h = _round_to_multiple(height)
             latent_dict = cls._latent_from_size(gen_w, gen_h)
 
-        # ── 5. Build sampler and sigmas ───────────────────────────────────────
+        # 5. Build sampler and sigmas
         sampler_obj = comfy.samplers.sampler_object(sampler)
         model_sampling = m.get_model_object("model_sampling")
 
@@ -338,17 +313,14 @@ class UITSampler(io.ComfyNode):
             ).cpu()
             sigmas = sigmas[-(steps + 1):]
 
-        # ── 6. Run sampling (with step image collection callback) ─────────────
+        # 6. Sample, collecting each step's x0 on the CPU
         noise = comfy.sample.prepare_noise(latent_dict["samples"], seed, None)
 
         x0_output = {}
         preview_steps = max(len(sigmas) - 1, 1)
         base_callback = latent_preview.prepare_callback(m, preview_steps, x0_output)
 
-        # Only stash x0 on the CPU here. Decoding (which may load models) must
-        # not happen while the diffusion model is running.
         step_x0_list = []
-        nan_state = {"step": None}
 
         def uitsampler_callback(step, x0, x, total_steps):
             if base_callback is not None:
@@ -357,15 +329,7 @@ class UITSampler(io.ComfyNode):
                 return
             with torch.no_grad():
                 x0_t = x0.tensors[0] if getattr(x0, "is_nested", False) else x0
-                x0_cpu = x0_t.detach().to("cpu", copy=True)
-                if nan_state["step"] is None and not bool(torch.isfinite(x0_cpu).all()):
-                    nan_state["step"] = step
-                    log.warning(
-                        "[UITSampler] NaN/Inf detected in the prediction at step %d/%d "
-                        "(seed=%d, sampler=%s, scheduler=%s, noise_scale=%.2f).",
-                        step + 1, total_steps, seed, sampler, scheduler, noise_scale,
-                    )
-                step_x0_list.append(x0_cpu)
+                step_x0_list.append(x0_t.detach().to("cpu", copy=True))
 
         samples_out = comfy.sample.sample_custom(
             m,
@@ -382,25 +346,13 @@ class UITSampler(io.ComfyNode):
             seed=seed,
         )
 
-        # ── 7. Sanitize NaN/Inf (and say so) ──────────────────────────────────
-        if not bool(torch.isfinite(samples_out).all()):
-            log.warning(
-                "[UITSampler] The final samples contain NaN/Inf; replacing them so the "
-                "image is not corrupted. Try another seed / a bf16 checkpoint "
-                "(not an FP16 conversion) / fewer or different sampler settings."
-            )
-            samples_out = torch.nan_to_num(samples_out, nan=0.0, posinf=1.0, neginf=-1.0)
-
-        # ── 8. Decode → IMAGE tensor ──────────────────────────────────────────
+        # 7. Decode final image
         image_out = _decode_to_image(vae, samples_out)
 
-        # ── 9. Pack step_images (decoded after sampling, one at a time) ───────
+        # 8. Decode step images (after sampling)
         step_images = None
         if step_x0_list:
-            decoded = []
-            for x0_cpu in step_x0_list:
-                x0_cpu = torch.nan_to_num(x0_cpu, nan=0.0, posinf=1.0, neginf=-1.0)
-                decoded.append(_decode_to_image(vae, x0_cpu).cpu())
+            decoded = [_decode_to_image(vae, x0_cpu).cpu() for x0_cpu in step_x0_list]
             step_images = torch.cat(decoded, dim=0)
             step_x0_list.clear()
             del decoded

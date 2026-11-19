@@ -1,4 +1,3 @@
-
 <div align="center">
 <img width="705" height="500" alt="ComfyUI-uit-hidream-o1_banner_silver_ratio" src="images/ComfyUI-uit-hidream-o1_banner_silver_ratio.png">
 </div>
@@ -7,16 +6,16 @@
 
 Single sampling node (**UIT Sampler**) for [HiDream-O1-Image](https://github.com/HiDream-ai/HiDream-O1-Image) .
 
-## ✨ Features
+## Features
 
-### 🎛️ UIT Sampler
+### UIT Sampler
 
 - Single node covering the full generation pipeline for UiT model.
 - img2img support — input images are automatically rescaled to 4 MP via Lanczos
 - Up to 2 reference images attachable to conditioning
 - `step_images` output — all intermediate denoising steps in one batch tensor
 
-## 👈 Models
+## Models
 
 - [Comfy-Org (Recommended)](https://huggingface.co/Comfy-Org/HiDream-O1-Image/tree/main/checkpoints)
 - [HiDream-O1-Image_clear (Finetuned model for clear outputs)](https://huggingface.co/easygoing0114/HiDream-O1-Image_clear)
@@ -24,7 +23,7 @@ Single sampling node (**UIT Sampler**) for [HiDream-O1-Image](https://github.com
 - [HiDream-O1-Image-Dev (Official)](https://huggingface.co/HiDream-ai/HiDream-O1-Image-Dev)
 - [HiDream-O1-Image-Dev-2604 (Official)](https://huggingface.co/HiDream-ai/HiDream-O1-Image-Dev-2604)
 
-## 🔍 Workflows
+## Workflows
 
 ### Text to Image
 
@@ -66,32 +65,34 @@ These images contain ComfyUI workflow.
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `model` | MODEL | ✅ | HiDream-O1 model loaded via Load Checkpoint |
-| `clip` | CLIP | ✅ | CLIP / text encoder (dummy connection) |
-| `vae` | VAE | ✅ | VAE (dummy connection) |
+| `model` | MODEL | required | HiDream-O1 model loaded via Load Checkpoint |
+| `clip` | CLIP | required | CLIP / text encoder (dummy connection) |
+| `vae` | VAE | required | VAE (dummy connection) |
 | `input_image` | IMAGE | optional | Source image for img2img; auto-rescaled to 4 MP |
 | `reference_image1` | IMAGE | optional | Reference image 1 |
 | `reference_image2` | IMAGE | optional | Reference image 2 |
 | `positive_prompt` | STRING | optional | Positive text prompt |
-| `negative_prompt` | STRING | optional | Negative text prompt |
+| `negative_prompt` | STRING | optional | Negative text prompt (has no effect when `cfg` is `1.0`) |
 
 **HiDream-O1 does not use an external VAE or CLIP**, but due to the specifications of ComfyUI, a dummy connection is required.
 
 ### Settings
 
-| Name | Type | Description |
-|---|---|---|
-| `width` | INT | Output width in pixels (ignored when `input_image` is connected) |
-| `height` | INT | Output height in pixels (ignored when `input_image` is connected) |
-| `seed` | INT | Random seed |
-| `cfg` | FLOAT | Classifier-free guidance scale |
-| `sampler` | ENUM | Sampler name (e.g. `euler`) |
-| `scheduler` | ENUM | Scheduler name (e.g. `normal`) |
-| `steps` | INT | Number of sampling steps |
-| `denoise` | FLOAT | Denoising strength (1.0 = full generation) |
-| `noise_scale` | FLOAT | Noise scale — base: `8.0`, dev: `7.5` |
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `width` | INT | `2048` | Output width in pixels (ignored when `input_image` is connected) |
+| `height` | INT | `2048` | Output height in pixels (ignored when `input_image` is connected) |
+| `seed` | INT | `0` | Random seed |
+| `cfg` | FLOAT | `1.0` | Classifier-free guidance scale. At the default of `1.0`, `negative_prompt` is disabled |
+| `sampler` | ENUM | `euler` | Sampler name |
+| `scheduler` | ENUM | `normal` | Scheduler name |
+| `steps` | INT | `12` | Number of sampling steps |
+| `denoise` | FLOAT | `1.0` | Denoising strength (1.0 = full generation) |
+| `noise_scale` | FLOAT | `7.6` | Noise scale — official reference values: base `8.0`, dev `7.5` |
 
 **Default resolution** is 2048×2048 (4 MP), matching the HiDream-O1 training resolution. When `input_image` is connected, the resolution is derived from the rescaled image.
+
+**Negative prompt and cfg:** The default `cfg` is `1.0`. At `cfg` = `1.0`, classifier-free guidance is not applied, so `negative_prompt` is disabled and has no effect on the result. Set `cfg` above `1.0` to make `negative_prompt` take effect.
 
 ### Outputs
 
@@ -102,7 +103,7 @@ These images contain ComfyUI workflow.
 
 ---
 
-## 🔥 Installation
+## Installation
 
 ### Install via Nodes Manager
 
@@ -123,14 +124,14 @@ git clone https://github.com/easygoing0114/ComfyUI-uit-hidream-o1.git
 
 ---
 
-## 👀 Tips
+## Tips
 
 - HiDream-O1-Image and UiT architecture: [English](https://www.ai-image-journey.com/2026/05/hidream-o1-image.html) | [Japanese](https://note.com/ai_image_journey/n/nc088edc43d6d)
 - Image Generative AI model License: [English](https://www.ai-image-journey.com/2025/09/ai-model-license.html) | [Japanese](https://note.com/ai_image_journey/n/n1083339913df)
 
 ---
 
-## ⚖️ License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
 
@@ -138,18 +139,22 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Update History
 
-### 2025.7.28 (v0.3.0)
+### 2026.11.19 (v0.3.2)
+
+- Set the default `cfg` to `1.0` and the default `noise_scale` to `7.6`. Documented that `negative_prompt` is disabled when `cfg` is `1.0`.
+
+### 2026.7.28 (v0.3.0)
 
 - Migrated to the comfyui v3 schema.
 
-### 2025.5.23 (v0.2.0)
+### 2026.5.23 (v0.2.0)
 
 - Fixed minor issues.
 
-### 2025.5.20 (v0.1.1)
+### 2026.5.20 (v0.1.1)
 
 - Fixed an issue where `reference_image` was also applied to `negative_cond`.
 
-### 2025.5.19 (v0.0.3)
+### 2026.5.19 (v0.0.3)
 
 - Initial release: UIT Sampler for HiDream-O1-Image

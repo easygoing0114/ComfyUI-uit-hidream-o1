@@ -1,5 +1,5 @@
 <div align="center">
-<img width="705" height="500" alt="ComfyUI-uit-hidream-o1_banner_silver_ratio" src="images/ComfyUI-uit-hidream-o1_banner_silver_ratio.png">
+<img width="705" height="500" alt="ComfyUI-uit-hidream-o1_banner_silver_ratio" src="images/ComfyUI-uit-hidream-o1_banner_21_9_new_photoreal.png">
 </div>
 
 # ComfyUI-uit-hidream-o1
